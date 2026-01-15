@@ -1,0 +1,45 @@
+
+/* Header */
+.Nav {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 글씨 양쪽으로 */
+  padding: 0 18px; /* 글씨 양쪽여백 */
+  background: #213758; /* 배경색 */
+  border-radius: 7px;  /* 모서리 둥글게 */
+  margin-bottom: 3px; /* 헤더 아래쪽 여백 */
+}
+
+.Nav_left {
+  display: flex; /* Home Schedule 근태관리 자리 */
+  gap: 15px; /* Home Schedule 근태관리 공간 */
+}
+
+.Nav_link {
+  text-decoration: none; /* a태그 밑줄 삭제 */
+  color: #ffffff; /* 글씨색 */
+  font-size: 16px; /* 글씨크기 */
+  padding: 10px 10px;        /* ✅ 배경이 보이도록 여백 */
+  border-radius: 6px;       /*  살짝 둥글게 */
+  transition: background-color 0.2s ease; /* 부드러운 변화 */
+}
+
+.Nav_link:hover {
+  background-color: rgb(36, 36, 36); /* 마우스 위치 시 배경만 진해짐 */
+}
+
+.Nav_login {
+  border: 0; /* 버튼태그 테두리 제거 */
+  background: transparent; /* 배경색 투명 */
+  font-size: 16px;
+  cursor: pointer; /* 마우스 위치 시 손가락 */
+  color: #ffffff;
+  padding: 10px 10px;        /* ✅ 배경이 보이도록 여백 */
+  border-radius: 6px;       /*  살짝 둥글게 */
+  transition: background-color 0.2s ease; /* 부드러운 변화 */
+}
+
+.Nav_login:hover {
+  background-color: rgb(36, 36, 36); /* 마우스 위치 시 배경만 진해짐 */
+}
