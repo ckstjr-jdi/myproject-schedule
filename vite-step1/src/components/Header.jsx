@@ -9,7 +9,7 @@ export default function Header() {
           Schedule
         </a>
         <a className="Nav_link" href="#">
-          일정관리
+          Calendar Search
         </a>
       </nav>
 
