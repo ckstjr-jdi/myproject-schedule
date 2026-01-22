@@ -1,14 +1,17 @@
 
 /* Header */
 .Nav {
+  max-width: 1200px;     /* ✅ 파란 바 폭 제한 */
+  margin: 12px auto;     /* ✅ 좌우 여백 + 위아래 여백 */
+  padding: 0 18px;       /* ✅ 안쪽 여백 */
   height: 56px;
+
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 글씨 양쪽으로 */
-  padding: 0 18px; /* 글씨 양쪽여백 */
-  background: #213758; /* 배경색 */
-  border-radius: 7px;  /* 모서리 둥글게 */
-  margin-bottom: 3px; /* 헤더 아래쪽 여백 */
+  justify-content: space-between;
+
+  background: #213758;
+  border-radius: 7px;
 }
 
 .Nav_left {
@@ -42,4 +45,10 @@
 
 .Nav_login:hover {
   background-color: rgb(36, 36, 36); /* 마우스 위치 시 배경만 진해짐 */
+}
+
+.calendar-container {
+  max-width: 1200px;   /* ⭐ 달력 최대 폭 */
+  margin: 0 auto;      /* ⭐ 좌우 여백 자동 */
+  padding: 0 16px;     /* ⭐ 화면 작을 때 여백 */
 }

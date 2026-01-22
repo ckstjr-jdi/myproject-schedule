@@ -1,7 +1,7 @@
 // src/components/EventModal.jsx
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 
-export default function EventModal({ show, onClose, event, onChange, onSave }) {
+export default function EventModal({ show, onClose, event, onChange, onSave, onDelete }) {
   // Control 변경 공통 처리 (title, start, end, memo, color)
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -13,9 +13,7 @@ export default function EventModal({ show, onClose, event, onChange, onSave }) {
   return (
     <Modal show={show} onHide={onClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title>
-          {event.id ? "📅일정 수정" : "📅새로운 일정 추가"}
-        </Modal.Title>
+        <Modal.Title>{event.id ? "🗓️일정 수정" : "🗓️일정 추가"}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -80,9 +78,16 @@ export default function EventModal({ show, onClose, event, onChange, onSave }) {
       </Modal.Body>
 
       <Modal.Footer>
+        {/* 기존의 입력된 값이 있을 때만 삭제버튼 활성화 */}
+        {event.id && (
+          <Button variant="danger" onClick={onDelete}>
+            삭제
+          </Button>
+        )}
         <Button variant="secondary" onClick={onClose}>
           취소
         </Button>
+        {/* 기존의 입력된 값이 있을 때는 수정, 없을 때는 저장버튼 활성화 */}
         <Button variant="primary" onClick={onSave}>
           {event.id ? "수정" : "저장"}
         </Button>
