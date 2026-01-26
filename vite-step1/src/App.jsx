@@ -52,22 +52,31 @@ const App = () => {
     });
   };
 
+
   //저장 및 수정 함수
   const handleSave = () => {
     //기존의 입력된 값이 있으면 수정, 없으면 등록
     if(newEvent.id) {
-      //수정
+      //수정  
+      if (newEvent.start > newEvent.end) { //시작날짜 < 종료날짜 일때 저장가능 유효성검사
+          window.alert("시작날짜보다 종료날짜가 큽니다.");
+          return
+        } else {
       setEvents(prev =>//전에 값들 중에서
           prev.map(ev =>//하나씩 꺼내 와서
               //값의 id를 기존의 입력된 id랑 비교해서 같다면 수정 다르면 기존 값 그대로유지
               ev.id === newEvent.id ? newEvent : ev
           )
-      );
+      )};
       //등록
     } else {
-      //기존의 일정 값과 새로 입력된 일정 값을 저장해주는 함수
-      setEvents((prev) => [...prev, { ...newEvent, id: String(Date.now()) }]);// id 자동 생성
-    
+      if (newEvent.start > newEvent.end){
+        window.alert("시작날짜보다 종료날짜가 큽니다.")
+        return
+      }else{
+        //기존의 일정 값과 새로 입력된 일정 값을 저장해주는 함수
+        setEvents((prev) => [...prev, { ...newEvent, id: String(Date.now()) }]); // id 자동 생성
+      }
       //저장하고 모달을 초기화 시켜주는 함수
       setNewEvent({
         title: "",
