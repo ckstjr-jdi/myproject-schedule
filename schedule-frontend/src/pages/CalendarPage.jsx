@@ -16,8 +16,9 @@ export default function CalendarPage({ events, onDateClick, onEventClick }) {
     end: e.end,
     backgroundColor: e.color,
     borderColor: e.color,
+    // ✅ FullCalendar가 event.backgroundColor를 안정적으로 쓰게 하려면 display 기본값 OK
     extendedProps: {
-      memo: e.memo,
+      memo: e.memo ?? "",
     },
   }));
 

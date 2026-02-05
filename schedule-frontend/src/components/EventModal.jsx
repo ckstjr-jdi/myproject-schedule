@@ -1,18 +1,37 @@
 // src/components/EventModal.jsx
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 
-export default function EventModal({ show, onClose, event, onChange, onSave, onDelete }) {
+export default function EventModal({
+  show,
+  onClose,
+  event,
+  onChange,
+  onSave,
+  onDelete,
+}) {
+  // ✅ event가 null/undefined여도 안전하게 처리
+  const safeEvent = {
+    id: "",
+    title: "",
+    start: "",
+    end: "",
+    memo: "",
+    color: "#213758",
+    ...(event || {}),
+  };
+
   // Control 변경 공통 처리 (title, start, end, memo, color)
   const handleChange = (e) => {
     const { name, value } = e.target;
-    //변화되는 값을 실시간으로 갖고 있다가 저장 버튼이 눌리면 setNewEvent값으로 들어감
-    onChange({ ...event, [name]: value });
+    onChange({ ...safeEvent, [name]: value });
   };
 
   return (
     <Modal show={show} onHide={onClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title>{event.id ? "🗓️일정 수정" : "🗓️일정 추가"}</Modal.Title>
+        <Modal.Title>
+          {safeEvent.id ? "🗓️일정 수정" : "🗓️일정 추가"}
+        </Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -22,8 +41,8 @@ export default function EventModal({ show, onClose, event, onChange, onSave, onD
             type="text"
             name="title"
             placeholder="일정제목을 입력해주세요"
-            value={event.title} //화면에 초기 값을 보여주고 변화 시 변화된 값을
-            onChange={handleChange} //Control창에 변화가 있으면 handleChange로 값을 실시간 전송해줌
+            value={safeEvent.title ?? ""}
+            onChange={handleChange}
           />
         </Form.Group>
 
@@ -34,7 +53,7 @@ export default function EventModal({ show, onClose, event, onChange, onSave, onD
               <Form.Control
                 type="datetime-local"
                 name="start"
-                value={event.start}
+                value={safeEvent.start ?? ""}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -46,7 +65,7 @@ export default function EventModal({ show, onClose, event, onChange, onSave, onD
               <Form.Control
                 type="datetime-local"
                 name="end"
-                value={event.end}
+                value={safeEvent.end ?? ""}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -59,7 +78,7 @@ export default function EventModal({ show, onClose, event, onChange, onSave, onD
             as="textarea"
             name="memo"
             placeholder="메모"
-            value={event.memo}
+            value={safeEvent.memo ?? ""}
             onChange={handleChange}
           />
         </Form.Group>
@@ -69,7 +88,7 @@ export default function EventModal({ show, onClose, event, onChange, onSave, onD
           <Form.Control
             type="color"
             name="color"
-            value={event.color}
+            value={safeEvent.color ?? "#213758"}
             onChange={handleChange}
             style={{ width: 60, height: 40, padding: 2 }}
           />
@@ -78,17 +97,19 @@ export default function EventModal({ show, onClose, event, onChange, onSave, onD
 
       <Modal.Footer>
         {/* 기존의 입력된 값이 있을 때만 삭제버튼 활성화 */}
-        {event.id && (
+        {safeEvent.id && (
           <Button variant="danger" onClick={onDelete}>
             삭제
           </Button>
         )}
+
         <Button variant="secondary" onClick={onClose}>
           취소
         </Button>
+
         {/* 기존의 입력된 값이 있을 때는 수정, 없을 때는 저장버튼 활성화 */}
         <Button variant="primary" onClick={onSave}>
-          {event.id ? "수정" : "저장"}
+          {safeEvent.id ? "수정" : "저장"}
         </Button>
       </Modal.Footer>
     </Modal>

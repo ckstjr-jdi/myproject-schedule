@@ -1,23 +1,15 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import CalendarPage from "./pages/CalendarPage";
 import EventModal from "./components/EventModal";
 
-// firebase
-import { db } from "./service/firebase";
+// ✅ Express API 연동
 import {
-  collection,
-  onSnapshot,
-  query,
-  orderBy,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  serverTimestamp,
-} from "firebase/firestore";
-
-const COLLECTION = "schedules";
+  getSchedules,
+  createSchedule,
+  updateSchedule,
+  deleteSchedule,
+} from "./service/schedulesApi";
 
 const App = () => {
   const [show, setShow] = useState(false);
@@ -25,31 +17,25 @@ const App = () => {
 
   const [events, setEvents] = useState([]);
 
-  // ✅ Firestore 구독(실시간 읽기)
-  useEffect(() => {
-    const q = query(
-      collection(db, COLLECTION),
-      orderBy("SCHEDULE_START", "asc"),
-    );
-
-    const unsub = onSnapshot(q, (snap) => {
-      const rows = snap.docs.map((d) => {
-        const data = d.data();
-        return {
-          id: d.id,
-          title: data.SCHEDULE_TITLE ?? "",
-          start: data.SCHEDULE_START ?? "",
-          end: data.SCHEDULE_END ?? "",
-          memo: data.SCHEDULE_CONTENT ?? "",
-          color: data.COLOR ?? "#213758",
-        };
-      });
-
-      setEvents(rows);
-    });
-
-    return () => unsub();
+  // ✅ 서버에서 일정 불러오기 (함수 고정)
+  const fetchEvents = useCallback(async () => {
+    try {
+      const data = await getSchedules();
+      setEvents(data);
+    } catch (err) {
+      console.error("GET /api/schedules error:", err);
+      window.alert("일정 불러오기 실패! 백엔드 서버가 켜져있는지 확인해줘.");
+    }
   }, []);
+
+  // ✅ (React 18 개발모드 StrictMode) effect 2번 실행 방지 가드
+  const didFetch = useRef(false);
+
+  useEffect(() => {
+    if (didFetch.current) return;
+    didFetch.current = true;
+    fetchEvents();
+  }, [fetchEvents]);
 
   // 새 일정/수정 일정 상태
   const [newEvent, setNewEvent] = useState({
@@ -102,45 +88,37 @@ const App = () => {
     });
   };
 
-  // ✅ 저장(추가/수정) - Firestore에 완전 연결
+  // ✅ 저장(추가/수정) - Express API 연결
   const handleSave = async () => {
     if (newEvent.start > newEvent.end) {
       window.alert("시작날짜보다 종료날짜가 큽니다.");
       return;
     }
 
-    // 공통 payload
     const payload = {
-      SCHEDULE_TITLE: newEvent.title,
-      SCHEDULE_START: newEvent.start,
-      SCHEDULE_END: newEvent.end,
-      SCHEDULE_CONTENT: newEvent.memo || "",
-      COLOR: newEvent.color || "#213758",
-      updatedAt: serverTimestamp(),
+      title: newEvent.title,
+      start: newEvent.start,
+      end: newEvent.end,
+      memo: newEvent.memo || "",
+      color: newEvent.color || "#213758",
     };
 
     try {
       if (newEvent.id) {
-        // ✅ 수정
-        const ref = doc(db, COLLECTION, newEvent.id);
-        await updateDoc(ref, payload);
+        await updateSchedule(newEvent.id, payload);
       } else {
-        // ✅ 등록
-        await addDoc(collection(db, COLLECTION), {
-          ...payload,
-          createdAt: serverTimestamp(),
-        });
+        await createSchedule(payload);
       }
 
-      // onSnapshot이 다시 내려주므로 로컬 events 만지지 않아도 됨
+      await fetchEvents();
       close();
     } catch (err) {
-      console.error("Firestore save error:", err);
+      console.error("Save error:", err);
       window.alert("저장 중 오류가 발생했습니다. 콘솔을 확인해주세요.");
     }
   };
 
-  // ✅ 삭제 - Firestore에 완전 연결
+  // ✅ 삭제 - Express API 연결
   const handleDelete = async () => {
     if (!newEvent.id) return;
 
@@ -148,13 +126,11 @@ const App = () => {
     if (!ok) return;
 
     try {
-      const ref = doc(db, COLLECTION, newEvent.id);
-      await deleteDoc(ref);
-
-      // onSnapshot이 다시 내려주므로 로컬 events 만지지 않아도 됨
+      await deleteSchedule(newEvent.id);
+      await fetchEvents();
       close();
     } catch (err) {
-      console.error("Firestore delete error:", err);
+      console.error("Delete error:", err);
       window.alert("삭제 중 오류가 발생했습니다. 콘솔을 확인해주세요.");
     }
   };

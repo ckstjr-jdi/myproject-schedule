@@ -1,8 +1,9 @@
-const router = require("express").Router();
+import express from "express";
 
-// 서버 살아있는지 확인용 라우트
-router.get("/health", (req, res) => {
-  res.json({ ok: true, message: "API is working" });
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.status(200).json({ message: "OK", status: "healthy" });
 });
 
-module.exports = router;
+export default router;

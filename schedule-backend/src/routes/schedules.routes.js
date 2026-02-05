@@ -1,79 +1,37 @@
-// src/routes/schedules.routes.js
-const router = require("express").Router();
-const { schedules } = require("../data/schedules.mock");
+import express from "express";
 
-// 간단 id 생성(라이브러리 없이)
-const makeId = () => Date.now().toString();
+const router = express.Router();
 
-// ✅ 전체 조회
+// ✅ 임시 메모리 저장소
+let schedules = [];
+
+// 전체 조회
 router.get("/", (req, res) => {
   res.json(schedules);
 });
 
-// ✅ 단건 조회
-router.get("/:id", (req, res) => {
-  const found = schedules.find((s) => s.id === req.params.id);
-  if (!found)
-    return res.status(404).json({ message: "일정을 찾을 수 없습니다." });
-  res.json(found);
-});
-
-// ✅ 등록
+// 등록
 router.post("/", (req, res) => {
-  const { title, start, end, color, category } = req.body;
-
-  if (!title || !start || !end) {
-    return res.status(400).json({ message: "title, start, end는 필수입니다." });
-  }
-  if (start > end) {
-    return res
-      .status(400)
-      .json({ message: "start는 end보다 늦을 수 없습니다." });
-  }
-
   const newSchedule = {
-    id: makeId(),
-    title,
-    start,
-    end,
-    color: color || "#3b82f6",
-    category: category || "personal",
+    id: Date.now().toString(),
+    ...req.body,
   };
-
   schedules.push(newSchedule);
-  res.status(201).json(newSchedule);
+  res.json(newSchedule);
 });
 
-// ✅ 수정
+// 수정
 router.put("/:id", (req, res) => {
-  const idx = schedules.findIndex((s) => s.id === req.params.id);
-  if (idx === -1)
-    return res.status(404).json({ message: "일정을 찾을 수 없습니다." });
-
-  const prev = schedules[idx];
-  const next = { ...prev, ...req.body, id: prev.id };
-
-  if (!next.title || !next.start || !next.end) {
-    return res.status(400).json({ message: "title, start, end는 필수입니다." });
-  }
-  if (next.start > next.end) {
-    return res
-      .status(400)
-      .json({ message: "start는 end보다 늦을 수 없습니다." });
-  }
-
-  schedules[idx] = next;
-  res.json(next);
+  const { id } = req.params;
+  schedules = schedules.map((s) => (s.id === id ? { ...s, ...req.body } : s));
+  res.json({ message: "updated" });
 });
 
-// ✅ 삭제
+// 삭제
 router.delete("/:id", (req, res) => {
-  const idx = schedules.findIndex((s) => s.id === req.params.id);
-  if (idx === -1)
-    return res.status(404).json({ message: "일정을 찾을 수 없습니다." });
-
-  schedules.splice(idx, 1);
-  res.status(204).send();
+  const { id } = req.params;
+  schedules = schedules.filter((s) => s.id !== id);
+  res.json({ message: "deleted" });
 });
 
-module.exports = router;
+export default router;
