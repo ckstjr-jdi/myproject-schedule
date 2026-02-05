@@ -5,10 +5,22 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
 import Header from "../components/Header";
-
 import "../styles/layout.css";
 
 export default function CalendarPage({ events, onDateClick, onEventClick }) {
+  // ✅ FullCalendar가 이해하는 형태로 변환 (memo는 extendedProps로!)
+  const fcEvents = (events || []).map((e) => ({
+    id: e.id,
+    title: e.title,
+    start: e.start,
+    end: e.end,
+    backgroundColor: e.color,
+    borderColor: e.color,
+    extendedProps: {
+      memo: e.memo,
+    },
+  }));
+
   return (
     <>
       <Header />
@@ -21,7 +33,7 @@ export default function CalendarPage({ events, onDateClick, onEventClick }) {
             center: "title",
             right: "dayGridMonth,timeGridWeek,timeGridDay",
           }}
-          events={events}
+          events={fcEvents}
           dateClick={onDateClick}
           eventClick={onEventClick}
           selectable={true}

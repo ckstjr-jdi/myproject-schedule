@@ -5,7 +5,6 @@ export default function EventModal({ show, onClose, event, onChange, onSave, onD
   // Control 변경 공통 처리 (title, start, end, memo, color)
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log({ name, value });
     //변화되는 값을 실시간으로 갖고 있다가 저장 버튼이 눌리면 setNewEvent값으로 들어감
     onChange({ ...event, [name]: value });
   };
